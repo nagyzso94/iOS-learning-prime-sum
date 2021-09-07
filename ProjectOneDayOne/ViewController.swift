@@ -13,6 +13,8 @@ class ViewController: UIViewController {
     
     let label = UILabel()
     let indicator = UIActivityIndicatorView()
+    let myGroup = DispatchGroup()
+
     
     var num1: Int? {
         didSet {
@@ -85,22 +87,34 @@ class ViewController: UIViewController {
         indicator.isHidden = false
         indicator.startAnimating()
         
+        //var params = [2000, 4000]
+        myGroup.enter()
         sumPrimes(upto: 2000) { number in
             DispatchQueue.main.async {
                 self.num1 = number
                 print("első sum: \(self.num1)")
+                self.myGroup.leave()
             }
         }
         
+        myGroup.enter()
         sumPrimes(upto: 4000) { num in
             DispatchQueue.main.async {
                 self.num2 = num
                 print("második sum: \(self.num2)")
+                self.myGroup.leave()
             }
         }
+                
+        myGroup.notify(queue: DispatchQueue.main) {
+            print("megvan mindkét szám. num1: \(self.num1), num2: \(self.num2)")
+        }
         
-        
-        
+//        group.notify(queue: DispatchQueue.global()) {
+//           print("Completed work: \(movieIds)")
+//           // Kick off the movies API calls
+//           PlaygroundPage.current.finishExecution()
+//         }
     }
     
     func updateUI(number1: Int, number2: Int){
